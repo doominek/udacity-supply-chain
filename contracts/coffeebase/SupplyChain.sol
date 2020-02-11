@@ -106,13 +106,13 @@ contract SupplyChain is FarmerRole {
 
     // Define a modifier that checks if an item.state of a upc is Packed
     modifier packed(uint _upc) {
-
+        require(items[_upc].itemState == State.Packed, "Item must be packed");
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is ForSale
     modifier forSale(uint _upc) {
-
+        require(items[_upc].itemState == State.ForSale, "Item must be for sale");
         _;
     }
 
@@ -220,34 +220,41 @@ contract SupplyChain is FarmerRole {
     // Define a function 'sellItem' that allows a farmer to mark an item 'ForSale'
     function sellItem(uint _upc, uint _price) public
         // Call modifier to check if upc has passed previous supply chain stage
-
+        packed(_upc)
         // Call modifier to verify caller of this function
-
+        onlyFarmer
     {
         // Update the appropriate fields
+        Item item = items[_upc];
+        item.itemState = State.ForSale;
+        item.productPrice = _price;
 
         // Emit the appropriate event
-
+        emit ForSale(_upc);
     }
 
-    // Define a function 'buyItem' that allows the disributor to mark an item 'Sold'
+    // Define a function 'buyItem' that allows the distributor to mark an item 'Sold'
     // Use the above defined modifiers to check if the item is available for sale, if the buyer has paid enough,
     // and any excess ether sent is refunded back to the buyer
     function buyItem(uint _upc) public payable
         // Call modifier to check if upc has passed previous supply chain stage
-
+        forSale(_upc)
         // Call modifer to check if buyer has paid enough
 
         // Call modifer to send any excess ether back to buyer
 
     {
-
         // Update the appropriate fields - ownerID, distributorID, itemState
+        Item item = items[_upc];
+        item.itemState = State.Sold;
+        item.ownerID = msg.sender;
+        item.distributorID = msg.sender;
 
         // Transfer money to farmer
 
-        // emit the appropriate event
 
+        // emit the appropriate event
+        emit Sold(_upc);
     }
 
     // Define a function 'shipItem' that allows the distributor to mark an item 'Shipped'
