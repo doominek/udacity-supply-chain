@@ -1,4 +1,6 @@
 pragma solidity ^0.4.24;
+
+
 // Define a contract 'Supplychain'
 contract SupplyChain {
 
@@ -156,11 +158,30 @@ contract SupplyChain {
     function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation, string _originFarmLatitude, string _originFarmLongitude, string _productNotes) public
     {
         // Add the new item as part of Harvest
+        Item memory newItem = Item({
+            upc : _upc,
+            sku : sku,
+            ownerID : _originFarmerID,
+            originFarmerID : _originFarmerID,
+            originFarmName : _originFarmName,
+            originFarmInformation : _originFarmInformation,
+            originFarmLatitude : _originFarmLatitude,
+            originFarmLongitude : _originFarmLongitude,
+            productID : 0,
+            productNotes : _productNotes,
+            productPrice : 0,
+            itemState : State.Harvested,
+            distributorID : 0,
+            retailerID : 0,
+            consumerID : 0
+        });
+
+        items[_upc] = newItem;
 
         // Increment sku
         sku = sku + 1;
         // Emit the appropriate event
-
+        emit Harvested(_upc);
     }
 
     // Define a function 'processtItem' that allows a farmer to mark an item 'Processed'
@@ -276,7 +297,15 @@ contract SupplyChain {
     )
     {
         // Assign values to the 8 parameters
-
+        Item storage item = items[_upc];
+        itemSKU = item.sku;
+        itemUPC = item.upc;
+        ownerID = item.ownerID;
+        originFarmerID = item.originFarmerID;
+        originFarmName = item.originFarmName;
+        originFarmInformation = item.originFarmInformation;
+        originFarmLatitude = item.originFarmLatitude;
+        originFarmLongitude = item.originFarmLongitude;
 
         return
         (
@@ -306,7 +335,16 @@ contract SupplyChain {
     )
     {
         // Assign values to the 9 parameters
-
+        Item storage item = items[_upc];
+        itemSKU = item.sku;
+        itemUPC = item.upc;
+        productID = item.productID;
+        productNotes = item.productNotes;
+        productPrice = item.productPrice;
+        itemState = uint8(item.itemState);
+        distributorID = item.distributorID;
+        retailerID = item.retailerID;
+        consumerID = item.consumerID;
 
         return
         (

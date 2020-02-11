@@ -63,7 +63,7 @@ contract('SupplyChain', function(accounts) {
         assert.equal(resultBufferOne[6], originFarmLatitude, 'Error: Missing or Invalid originFarmLatitude')
         assert.equal(resultBufferOne[7], originFarmLongitude, 'Error: Missing or Invalid originFarmLongitude')
         assert.equal(resultBufferTwo[5], 0, 'Error: Invalid item State')
-        truffleAssert.eventEmitted(tx, 'Harvested', { upc });
+        truffleAssert.eventEmitted(tx, 'Harvested', { upc: web3.utils.toBN(upc) });
     })    
 
     // 2nd Test
