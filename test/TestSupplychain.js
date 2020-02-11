@@ -182,7 +182,7 @@ contract('SupplyChain', function (accounts) {
                         await supplyChain.addDistributor(distributorID, { from: ownerID });
 
                         // Mark an item as Sold by calling function buyItem()
-                        lastTx = await supplyChain.buyItem(upc, { from: distributorID });
+                        lastTx = await supplyChain.buyItem(upc, { from: distributorID, value: productPrice });
 
                         // Retrieve the just now saved item from blockchain by calling function fetchItem()
                         const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
@@ -196,9 +196,31 @@ contract('SupplyChain', function (accounts) {
                         truffleAssert.eventEmitted(lastTx, 'Sold', { upc: web3.utils.toBN(upc) });
                     });
 
+                    it("Buying should transfer money from distributor to farmer", async () => {
+                        // await supplyChain.addDistributor(distributorID, { from: ownerID });
+
+                        const farmerInitialBalance = await web3.eth.getBalance(originFarmerID);
+                        const distributorInitialBalance = await web3.eth.getBalance(distributorID);
+
+                        // Mark an item as Sold by calling function buyItem()
+                        lastTx = await supplyChain.buyItem(upc, { from: distributorID, value: web3.utils.toWei('2', 'ether') });
+
+                        const farmerFinalBalance = await web3.eth.getBalance(originFarmerID);
+                        const distributorFinalBalance = await web3.eth.getBalance(distributorID);
+
+                        // Verify the result set
+                        console.log(farmerInitialBalance, distributorInitialBalance);
+                        console.log(farmerFinalBalance, distributorFinalBalance);
+                        console.log(typeof farmerInitialBalance);
+
+                        console.log('adding', web3.utils.toBN(farmerInitialBalance).add(web3.utils.toBN(farmerFinalBalance)).toString());
+
+                        truffleAssert.eventEmitted(lastTx, 'Sold', { upc: web3.utils.toBN(upc) });
+                    });
+
                     it("Should not allow to buy item when caller not in distributor role", async () => {
                         try {
-                            await supplyChain.buyItem(upc, { from: retailerID });
+                            await supplyChain.buyItem(upc, { from: retailerID, value: productPrice });
                             assert.fail("should throw error");
                         } catch (e) {
                             assert.equal(e.reason, "Only Distributor allowed")
@@ -207,8 +229,8 @@ contract('SupplyChain', function (accounts) {
 
                     it("Should not allow to buy item when it's not for sale", async () => {
                         try {
-                            await supplyChain.buyItem(upc);
-                            await supplyChain.buyItem(upc);
+                            await supplyChain.buyItem(upc, { value: productPrice });
+                            await supplyChain.buyItem(upc, { value: productPrice });
                             assert.fail("should throw error");
                         } catch (e) {
                             assert.equal(e.reason, "Item must be for sale")

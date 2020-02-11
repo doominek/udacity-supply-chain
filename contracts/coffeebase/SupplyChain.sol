@@ -90,7 +90,7 @@ contract SupplyChain is FarmerRole, DistributorRole {
         _;
         uint _price = items[_upc].productPrice;
         uint amountToReturn = msg.value - _price;
-        items[_upc].consumerID.transfer(amountToReturn);
+        msg.sender.transfer(amountToReturn);
     }
 
     // Define a modifier that checks if an item.state of a upc is Harvested
@@ -241,9 +241,9 @@ contract SupplyChain is FarmerRole, DistributorRole {
         // Call modifier to check if upc has passed previous supply chain stage
         forSale(_upc)
         // Call modifer to check if buyer has paid enough
-
+        paidEnough(_upc)
         // Call modifer to send any excess ether back to buyer
-
+        checkValue(_upc)
         onlyDistributor
     {
         // Update the appropriate fields - ownerID, distributorID, itemState
@@ -253,7 +253,8 @@ contract SupplyChain is FarmerRole, DistributorRole {
         item.distributorID = msg.sender;
 
         // Transfer money to farmer
-
+        uint _price = items[_upc].productPrice;
+        items[_upc].originFarmerID.transfer(_price);
 
         // emit the appropriate event
         emit Sold(_upc);
