@@ -100,7 +100,7 @@ contract SupplyChain is FarmerRole {
 
     // Define a modifier that checks if an item.state of a upc is Processed
     modifier processed(uint _upc) {
-
+        require(items[_upc].itemState == State.Processed, "Item must be processed");
         _;
     }
 
@@ -195,7 +195,7 @@ contract SupplyChain is FarmerRole {
         onlyFarmer
     {
         // Update the appropriate fields
-        Item storage item = items[_upc];
+        Item item = items[_upc];
         item.itemState = State.Processed;
 
         // Emit the appropriate event
@@ -205,14 +205,16 @@ contract SupplyChain is FarmerRole {
     // Define a function 'packItem' that allows a farmer to mark an item 'Packed'
     function packItem(uint _upc) public
         // Call modifier to check if upc has passed previous supply chain stage
-
+        processed(_upc)
         // Call modifier to verify caller of this function
-
+        onlyFarmer
     {
         // Update the appropriate fields
+        Item item = items[_upc];
+        item.itemState = State.Packed;
 
         // Emit the appropriate event
-
+        emit Packed(_upc);
     }
 
     // Define a function 'sellItem' that allows a farmer to mark an item 'ForSale'

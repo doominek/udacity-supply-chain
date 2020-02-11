@@ -4,8 +4,9 @@ const SupplyChain = artifacts.require('SupplyChain');
 const truffleAssert = require('truffle-assertions');
 
 const ItemStates = Object.freeze({
-    HARVESTED:   { name: "Harvested", value: 0 },
-    PROCESSED:  { name: "Processed", value: 1 }
+    HARVESTED: {name: "Harvested", value: 0},
+    PROCESSED: {name: "Processed", value: 1},
+    PACKED: {name: "Packed", value: 2}
 });
 
 contract('SupplyChain', function (accounts) {
@@ -78,7 +79,7 @@ contract('SupplyChain', function (accounts) {
 
         it("Should not allow to process item when caller not in farmer role", async () => {
             try {
-                await supplyChain.processItem(upc, { from: distributorID });
+                await supplyChain.processItem(upc, {from: distributorID});
                 assert.fail("should throw error");
             } catch (e) {
                 assert.equal(e.reason, "Only Farmer allowed")
@@ -95,113 +96,132 @@ contract('SupplyChain', function (accounts) {
             }
         });
 
-        // 3rd Test
-        it("Testing smart contract function packItem() that allows a farmer to pack coffee", async () => {
-            // Declare and Initialize a variable for event
+        describe("after processing", async () => {
+            beforeEach(async () => {
+                lastTx = await supplyChain.processItem(upc);
+            });
+
+            it("Testing smart contract function packItem() that allows a farmer to pack coffee", async () => {
+                // Mark an item as Packed by calling function packItem()
+                lastTx = await supplyChain.packItem(upc);
+
+                // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+
+                // Verify the result set
+                assert.equal(resultBufferTwo[5], ItemStates.PACKED.value, 'Item should be in Packed state');
+                truffleAssert.eventEmitted(lastTx, 'Packed', {upc: web3.utils.toBN(upc)});
+            });
+
+            it("Should not allow to pack item when caller not in farmer role", async () => {
+                try {
+                    await supplyChain.packItem(upc, {from: distributorID});
+                    assert.fail("should throw error");
+                } catch (e) {
+                    assert.equal(e.reason, "Only Farmer allowed")
+                }
+            });
+
+            it("Should not allow to pack item when it's not harvested", async () => {
+                try {
+                    await supplyChain.packItem(upc);
+                    await supplyChain.packItem(upc);
+                    assert.fail("should throw error");
+                } catch (e) {
+                    assert.equal(e.reason, "Item must be processed")
+                }
+            });
+
+            // 4th Test
+            it("Testing smart contract function sellItem() that allows a farmer to sell coffee", async () => {
+                // Declare and Initialize a variable for event
 
 
-            // Watch the emitted event Packed()
+                // Watch the emitted event ForSale()
 
 
-            // Mark an item as Packed by calling function packItem()
+                // Mark an item as ForSale by calling function sellItem()
 
 
-            // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                // Retrieve the just now saved item from blockchain by calling function fetchItem()
 
 
-            // Verify the result set
+                // Verify the result set
 
-        });
+            });
 
-        // 4th Test
-        it("Testing smart contract function sellItem() that allows a farmer to sell coffee", async () => {
-            // Declare and Initialize a variable for event
-
-
-            // Watch the emitted event ForSale()
+            // 5th Test
+            it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async () => {
+                // Declare and Initialize a variable for event
 
 
-            // Mark an item as ForSale by calling function sellItem()
+                // Watch the emitted event Sold()
+                var event = supplyChain.Sold()
 
 
-            // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                // Mark an item as Sold by calling function buyItem()
 
 
-            // Verify the result set
-
-        });
-
-        // 5th Test
-        it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async () => {
-            // Declare and Initialize a variable for event
+                // Retrieve the just now saved item from blockchain by calling function fetchItem()
 
 
-            // Watch the emitted event Sold()
-            var event = supplyChain.Sold()
+                // Verify the result set
+
+            });
+
+            // 6th Test
+            it("Testing smart contract function shipItem() that allows a distributor to ship coffee", async () => {
+                // Declare and Initialize a variable for event
 
 
-            // Mark an item as Sold by calling function buyItem()
+                // Watch the emitted event Shipped()
 
 
-            // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                // Mark an item as Sold by calling function buyItem()
 
 
-            // Verify the result set
-
-        });
-
-        // 6th Test
-        it("Testing smart contract function shipItem() that allows a distributor to ship coffee", async () => {
-            // Declare and Initialize a variable for event
+                // Retrieve the just now saved item from blockchain by calling function fetchItem()
 
 
-            // Watch the emitted event Shipped()
+                // Verify the result set
+
+            });
+
+            // 7th Test
+            it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
+                // Declare and Initialize a variable for event
 
 
-            // Mark an item as Sold by calling function buyItem()
+                // Watch the emitted event Received()
 
 
-            // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                // Mark an item as Sold by calling function buyItem()
 
 
-            // Verify the result set
-
-        });
-
-        // 7th Test
-        it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
-            // Declare and Initialize a variable for event
+                // Retrieve the just now saved item from blockchain by calling function fetchItem()
 
 
-            // Watch the emitted event Received()
+                // Verify the result set
+
+            });
+
+            // 8th Test
+            it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
+                // Declare and Initialize a variable for event
 
 
-            // Mark an item as Sold by calling function buyItem()
+                // Watch the emitted event Purchased()
 
 
-            // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                // Mark an item as Sold by calling function buyItem()
 
 
-            // Verify the result set
-
-        });
-
-        // 8th Test
-        it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
-            // Declare and Initialize a variable for event
+                // Retrieve the just now saved item from blockchain by calling function fetchItem()
 
 
-            // Watch the emitted event Purchased()
+                // Verify the result set
 
-
-            // Mark an item as Sold by calling function buyItem()
-
-
-            // Retrieve the just now saved item from blockchain by calling function fetchItem()
-
-
-            // Verify the result set
-
+            });
         });
     });
 
