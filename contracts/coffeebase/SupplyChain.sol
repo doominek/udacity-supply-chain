@@ -1,8 +1,10 @@
 pragma solidity ^0.4.24;
 
+import "../coffeeaccesscontrol/FarmerRole.sol";
+
 
 // Define a contract 'Supplychain'
-contract SupplyChain {
+contract SupplyChain is FarmerRole {
 
     // Define 'owner'
     address owner;
@@ -92,7 +94,7 @@ contract SupplyChain {
 
     // Define a modifier that checks if an item.state of a upc is Harvested
     modifier harvested(uint _upc) {
-        require(items[_upc].itemState == State.Harvested);
+        require(items[_upc].itemState == State.Harvested, "Item must be harvested");
         _;
     }
 
@@ -155,7 +157,8 @@ contract SupplyChain {
     }
 
     // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
-    function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation, string _originFarmLatitude, string _originFarmLongitude, string _productNotes) public
+    function harvestItem(uint _upc, address _originFarmerID, string _originFarmName, string _originFarmInformation,
+        string _originFarmLatitude, string _originFarmLongitude, string _productNotes) public
     {
         // Add the new item as part of Harvest
         Item memory newItem = Item({
@@ -187,14 +190,16 @@ contract SupplyChain {
     // Define a function 'processtItem' that allows a farmer to mark an item 'Processed'
     function processItem(uint _upc) public
         // Call modifier to check if upc has passed previous supply chain stage
-
+        harvested(_upc)
         // Call modifier to verify caller of this function
-
+        onlyFarmer
     {
         // Update the appropriate fields
+        Item storage item = items[_upc];
+        item.itemState = State.Processed;
 
         // Emit the appropriate event
-
+        emit Processed(_upc);
     }
 
     // Define a function 'packItem' that allows a farmer to mark an item 'Packed'
