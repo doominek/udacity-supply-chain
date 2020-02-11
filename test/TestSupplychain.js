@@ -179,6 +179,8 @@ contract('SupplyChain', function (accounts) {
 
                     // 5th Test
                     it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async () => {
+                        await supplyChain.addDistributor(distributorID, { from: ownerID });
+
                         // Mark an item as Sold by calling function buyItem()
                         lastTx = await supplyChain.buyItem(upc, { from: distributorID });
 
@@ -194,22 +196,22 @@ contract('SupplyChain', function (accounts) {
                         truffleAssert.eventEmitted(lastTx, 'Sold', { upc: web3.utils.toBN(upc) });
                     });
 
-                    it.skip("Should not allow to buy item when caller not in distributor role", async () => {
+                    it("Should not allow to buy item when caller not in distributor role", async () => {
                         try {
-                            await supplyChain.sellItem(upc, productPrice, { from: distributorID });
+                            await supplyChain.buyItem(upc, { from: retailerID });
                             assert.fail("should throw error");
                         } catch (e) {
-                            assert.equal(e.reason, "Only Farmer allowed")
+                            assert.equal(e.reason, "Only Distributor allowed")
                         }
                     });
 
-                    it.skip("Should not allow to buy item when it's not for sale", async () => {
+                    it("Should not allow to buy item when it's not for sale", async () => {
                         try {
-                            await supplyChain.sellItem(upc, productPrice);
-                            await supplyChain.sellItem(upc, productPrice);
+                            await supplyChain.buyItem(upc);
+                            await supplyChain.buyItem(upc);
                             assert.fail("should throw error");
                         } catch (e) {
-                            assert.equal(e.reason, "Item must be packed")
+                            assert.equal(e.reason, "Item must be for sale")
                         }
                     });
 

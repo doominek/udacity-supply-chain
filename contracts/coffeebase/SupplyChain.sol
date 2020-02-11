@@ -1,10 +1,11 @@
 pragma solidity ^0.4.24;
 
 import "../coffeeaccesscontrol/FarmerRole.sol";
+import "../coffeeaccesscontrol/DistributorRole.sol";
 
 
 // Define a contract 'Supplychain'
-contract SupplyChain is FarmerRole {
+contract SupplyChain is FarmerRole, DistributorRole {
 
     // Define 'owner'
     address owner;
@@ -195,7 +196,7 @@ contract SupplyChain is FarmerRole {
         onlyFarmer
     {
         // Update the appropriate fields
-        Item item = items[_upc];
+        Item storage item = items[_upc];
         item.itemState = State.Processed;
 
         // Emit the appropriate event
@@ -210,7 +211,7 @@ contract SupplyChain is FarmerRole {
         onlyFarmer
     {
         // Update the appropriate fields
-        Item item = items[_upc];
+        Item storage item = items[_upc];
         item.itemState = State.Packed;
 
         // Emit the appropriate event
@@ -225,7 +226,7 @@ contract SupplyChain is FarmerRole {
         onlyFarmer
     {
         // Update the appropriate fields
-        Item item = items[_upc];
+        Item storage item = items[_upc];
         item.itemState = State.ForSale;
         item.productPrice = _price;
 
@@ -243,9 +244,10 @@ contract SupplyChain is FarmerRole {
 
         // Call modifer to send any excess ether back to buyer
 
+        onlyDistributor
     {
         // Update the appropriate fields - ownerID, distributorID, itemState
-        Item item = items[_upc];
+        Item storage item = items[_upc];
         item.itemState = State.Sold;
         item.ownerID = msg.sender;
         item.distributorID = msg.sender;
