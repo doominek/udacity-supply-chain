@@ -2,10 +2,11 @@ pragma solidity ^0.4.24;
 
 import "../coffeeaccesscontrol/FarmerRole.sol";
 import "../coffeeaccesscontrol/DistributorRole.sol";
+import "../coffeeaccesscontrol/RetailerRole.sol";
 
 
 // Define a contract 'Supplychain'
-contract SupplyChain is FarmerRole, DistributorRole {
+contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
 
     // Define 'owner'
     address owner;
@@ -282,6 +283,7 @@ contract SupplyChain is FarmerRole, DistributorRole {
         // Call modifier to check if upc has passed previous supply chain stage
         shipped(_upc)
         // Access Control List enforced by calling Smart Contract / DApp
+        onlyRetailer
     {
         // Update the appropriate fields - ownerID, retailerID, itemState
         Item storage item = items[_upc];

@@ -295,6 +295,8 @@ contract('SupplyChain', function (accounts) {
 
                             // 7th Test
                             it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
+                                await supplyChain.addRetailer(retailerID);
+
                                 // Mark an item as Received by calling function receiveItem()
                                 lastTx = await supplyChain.receiveItem(upc, { from: retailerID });
 
