@@ -31,13 +31,11 @@ contract('SupplyChain', function (accounts) {
     const originFarmInformation = "Yarray Valley";
     const originFarmLatitude = "-38.239770";
     const originFarmLongitude = "144.341490";
-    const productID = sku + upc;
     const productNotes = "Best beans for Espresso";
     const productPrice = web3.utils.toWei(new BN("1"), "ether");
     const distributorID = accounts[2];
     const retailerID = accounts[3];
     const consumerID = accounts[4];
-    const emptyAddress = '0x00000000000000000000000000000000000000';
 
     let supplyChain;
     let lastTx;
@@ -337,7 +335,7 @@ contract('SupplyChain', function (accounts) {
 
                                 // 8th Test
                                 it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
-                                    // await supplyChain.addDistributor(distributorID, { from: ownerID });
+                                    await supplyChain.addConsumer(consumerID, { from: ownerID });
 
                                     // Mark an item as Sold by calling function buyItem()
                                     lastTx = await supplyChain.purchaseItem(upc, {
@@ -383,7 +381,7 @@ contract('SupplyChain', function (accounts) {
                                     expect(consumerBalanceChange).to.lt.BN(productPrice.clone().add(maxTransactionFee));
                                 });
 
-                                it.skip("Should not allow to purchase item when caller not in consumer role", async () => {
+                                it("Should not allow to purchase item when caller not in consumer role", async () => {
                                     try {
                                         await supplyChain.purchaseItem(upc, { from: retailerID, value: productPrice });
                                         assert.fail("should throw error");
@@ -401,6 +399,41 @@ contract('SupplyChain', function (accounts) {
                                         assert.equal(e.reason, "Item must be received")
                                     }
                                 });
+
+                                describe("after purchasing", async () => {
+                                    beforeEach(async () => {
+                                        await supplyChain.purchaseItem(upc, { value: productPrice });
+                                    });
+
+                                    // 9th Test
+                                    it("Testing smart contract function fetchItemBufferOne() that allows anyone to fetch item details from blockchain", async () => {
+                                        // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                                        const result = await supplyChain.fetchItemBufferOne(upc);
+
+                                        // Verify the result set
+                                        assert.equal(result.itemUPC, upc, 'Error: Invalid item UPC');
+                                        assert.equal(result.ownerID, ownerID, 'Error: Missing or Invalid ownerID');
+                                        assert.equal(result.originFarmerID, originFarmerID, 'Error: Missing or Invalid originFarmerID');
+                                        assert.equal(result.originFarmName, originFarmName, 'Error: Missing or Invalid originFarmName');
+                                        assert.equal(result.originFarmInformation, originFarmInformation, 'Error: Missing or Invalid originFarmInformation');
+                                        assert.equal(result.originFarmLatitude, originFarmLatitude, 'Error: Missing or Invalid originFarmLatitude');
+                                        assert.equal(result.originFarmLongitude, originFarmLongitude, 'Error: Missing or Invalid originFarmLongitude');
+                                    });
+                                    // 10th Test
+                                    it("Testing smart contract function fetchItemBufferTwo() that allows anyone to fetch item details from blockchain", async () => {
+                                        // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                                        const result = await supplyChain.fetchItemBufferTwo(upc);
+
+                                        // Verify the result set:
+                                        assert.equal(result.itemUPC, upc, 'Error: Invalid item UPC');
+                                        assert.equal(result.productNotes, productNotes, 'Error: Missing or Invalid productNotes');
+                                        assert.equal(result.productPrice.toString(), productPrice.toString(), 'Error: Missing or Invalid productPrice');
+                                        assert.equal(result.itemState, ItemStates.PURCHASED.value, 'Error: Missing or Invalid itemState');
+                                        assert.equal(result.distributorID, ownerID, 'Error: Missing or Invalid distributorID');
+                                        assert.equal(result.retailerID, ownerID, 'Error: Missing or Invalid retailerID');
+                                        assert.equal(result.consumerID, ownerID, 'Error: Missing or Invalid consumerID');
+                                    });
+                                });
                             });
                         });
                     });
@@ -408,28 +441,5 @@ contract('SupplyChain', function (accounts) {
             });
         });
     });
-
-    // 9th Test
-    it("Testing smart contract function fetchItemBufferOne() that allows anyone to fetch item details from blockchain", async () => {
-        const supplyChain = await SupplyChain.deployed()
-
-        // Retrieve the just now saved item from blockchain by calling function fetchItem()
-
-
-        // Verify the result set:
-
-    });
-
-    // 10th Test
-    it("Testing smart contract function fetchItemBufferTwo() that allows anyone to fetch item details from blockchain", async () => {
-        const supplyChain = await SupplyChain.deployed()
-
-        // Retrieve the just now saved item from blockchain by calling function fetchItem()
-
-
-        // Verify the result set:
-
-    })
-
 });
 
