@@ -254,8 +254,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
         item.distributorID = msg.sender;
 
         // Transfer money to farmer
-        uint _price = items[_upc].productPrice;
-        items[_upc].originFarmerID.transfer(_price);
+        item.originFarmerID.transfer(item.productPrice);
 
         // emit the appropriate event
         emit Sold(_upc);
@@ -301,12 +300,17 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
         // Call modifier to check if upc has passed previous supply chain stage
 
         // Access Control List enforced by calling Smart Contract / DApp
+        paidEnough(_upc)
+        checkValue(_upc)
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
         Item storage item = items[_upc];
         item.itemState = State.Purchased;
         item.consumerID = msg.sender;
         item.ownerID = msg.sender;
+
+        // Transfer money to distributor
+        item.distributorID.transfer(item.productPrice);
 
         // Emit the appropriate event
         emit Purchased(_upc);

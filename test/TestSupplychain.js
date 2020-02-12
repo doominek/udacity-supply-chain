@@ -357,17 +357,17 @@ contract('SupplyChain', function (accounts) {
                                     truffleAssert.eventEmitted(lastTx, 'Purchased', { upc: web3.utils.toBN(upc) });
                                 });
 
-                                it.skip("Purchasing should transfer ether to distributor", async () => {
-                                    const distributorInitialBalance = new BN(await web3.eth.getBalance(distributorID));
+                                it("Purchasing should transfer ether to distributor", async () => {
+                                    const distributorInitialBalance = new BN(await web3.eth.getBalance(ownerID));
 
                                     await supplyChain.purchaseItem(upc, { from: consumerID, value: productPrice });
 
-                                    const distributorFinalBalance = new BN(await web3.eth.getBalance(distributorID));
+                                    const distributorFinalBalance = new BN(await web3.eth.getBalance(ownerID));
 
                                     expect(distributorFinalBalance).to.eq.BN(distributorInitialBalance.add(productPrice));
                                 });
 
-                                it.skip("Purchasing should refund ether to the payer if paid more than enough", async () => {
+                                it("Purchasing should refund ether to the payer if paid more than enough", async () => {
                                     const consumerInitialBalance = new BN(await web3.eth.getBalance(consumerID));
 
                                     await supplyChain.purchaseItem(upc, {
