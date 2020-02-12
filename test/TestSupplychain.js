@@ -17,6 +17,7 @@ const ItemStates = Object.freeze({
     FOR_SALE: { name: "ForSale", value: 3 },
     SOLD: { name: "Sold", value: 4 },
     SHIPPED: { name: "Shipped", value: 5 },
+    RECEIVED: { name: "Received", value: 6 },
 });
 
 contract('SupplyChain', function (accounts) {
@@ -286,41 +287,64 @@ contract('SupplyChain', function (accounts) {
                             }
                         });
 
-
-                        // 7th Test
-                        it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
-                            // Declare and Initialize a variable for event
-
-
-                            // Watch the emitted event Received()
+                        describe("after shipping", async () => {
+                            beforeEach(async () => {
+                                lastTx = await supplyChain.shipItem(upc);
+                            });
 
 
-                            // Mark an item as Sold by calling function buyItem()
+                            // 7th Test
+                            it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
+                                // Mark an item as Received by calling function receiveItem()
+                                lastTx = await supplyChain.receiveItem(upc, { from: retailerID });
+
+                                const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
+                                const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+
+                                // Verify the result set
+                                expect(resultBufferTwo.itemState).to.eq.BN(ItemStates.RECEIVED.value);
+                                assert.equal(resultBufferTwo.retailerID, retailerID, 'Distributor should be set');
+                                assert.equal(resultBufferOne.ownerID, retailerID, 'Owner should be changed to distributor');
+
+                                truffleAssert.eventEmitted(lastTx, 'Received', { upc: web3.utils.toBN(upc) });
+                            });
+
+                            it("Should not allow to receive item when caller not in retailer role", async () => {
+                                try {
+                                    await supplyChain.receiveItem(upc, { from: distributorID });
+                                    assert.fail("should throw error");
+                                } catch (e) {
+                                    assert.equal(e.reason, "Only Retailer allowed")
+                                }
+                            });
+
+                            it("Should not allow to receive item when it's not shipped", async () => {
+                                try {
+                                    await supplyChain.receiveItem(upc);
+                                    await supplyChain.receiveItem(upc);
+                                    assert.fail("should throw error");
+                                } catch (e) {
+                                    assert.equal(e.reason, "Item must be shipped")
+                                }
+                            });
+
+                            // 8th Test
+                            it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
+                                // Declare and Initialize a variable for event
 
 
-                            // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                                // Watch the emitted event Purchased()
 
 
-                            // Verify the result set
-
-                        });
-
-                        // 8th Test
-                        it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
-                            // Declare and Initialize a variable for event
+                                // Mark an item as Sold by calling function buyItem()
 
 
-                            // Watch the emitted event Purchased()
+                                // Retrieve the just now saved item from blockchain by calling function fetchItem()
 
 
-                            // Mark an item as Sold by calling function buyItem()
+                                // Verify the result set
 
-
-                            // Retrieve the just now saved item from blockchain by calling function fetchItem()
-
-
-                            // Verify the result set
-
+                            });
                         });
                     });
                 });
