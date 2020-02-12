@@ -3,6 +3,13 @@
 const SupplyChain = artifacts.require('SupplyChain');
 const truffleAssert = require('truffle-assertions');
 
+const chai = require('chai');
+const expect = chai.expect;
+const BN = require('bn.js');
+const bnChai = require('bn-chai');
+
+chai.use(bnChai(BN));
+
 const ItemStates = Object.freeze({
     HARVESTED: { name: "Harvested", value: 0 },
     PROCESSED: { name: "Processed", value: 1 },
@@ -23,7 +30,7 @@ contract('SupplyChain', function (accounts) {
     const originFarmLongitude = "144.341490";
     const productID = sku + upc;
     const productNotes = "Best beans for Espresso";
-    const productPrice = web3.utils.toWei("1", "ether");
+    const productPrice = web3.utils.toWei(new BN("1"), "ether");
     const distributorID = accounts[2];
     const retailerID = accounts[3];
     const consumerID = accounts[4];
@@ -148,8 +155,9 @@ contract('SupplyChain', function (accounts) {
                     const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
 
                     // Verify the result set
-                    assert.equal(resultBufferTwo.itemState, ItemStates.FOR_SALE.value, 'Item should be in ForSale state');
-                    assert.equal(resultBufferTwo.productPrice, productPrice, 'Invalid price');
+                    expect(resultBufferTwo.itemState).to.eq.BN(ItemStates.FOR_SALE.value);
+                    expect(resultBufferTwo.productPrice).to.eq.BN(productPrice);
+
                     truffleAssert.eventEmitted(lastTx, 'ForSale', { upc: web3.utils.toBN(upc) });
                 });
 
@@ -196,26 +204,27 @@ contract('SupplyChain', function (accounts) {
                         truffleAssert.eventEmitted(lastTx, 'Sold', { upc: web3.utils.toBN(upc) });
                     });
 
-                    it("Buying should transfer money from distributor to farmer", async () => {
-                        // await supplyChain.addDistributor(distributorID, { from: ownerID });
+                    it("Buying should transfer ether to farmer", async () => {
+                        const farmerInitialBalance = new BN(await web3.eth.getBalance(originFarmerID));
 
-                        const farmerInitialBalance = await web3.eth.getBalance(originFarmerID);
-                        const distributorInitialBalance = await web3.eth.getBalance(distributorID);
+                        await supplyChain.buyItem(upc, { from: distributorID, value: productPrice });
 
-                        // Mark an item as Sold by calling function buyItem()
-                        lastTx = await supplyChain.buyItem(upc, { from: distributorID, value: web3.utils.toWei('2', 'ether') });
+                        const farmerFinalBalance = new BN(await web3.eth.getBalance(originFarmerID));
 
-                        const farmerFinalBalance = await web3.eth.getBalance(originFarmerID);
-                        const distributorFinalBalance = await web3.eth.getBalance(distributorID);
+                        expect(farmerFinalBalance).to.eq.BN(farmerInitialBalance.add(productPrice));
+                    });
 
-                        // Verify the result set
-                        console.log(farmerInitialBalance, distributorInitialBalance);
-                        console.log(farmerFinalBalance, distributorFinalBalance);
-                        console.log(typeof farmerInitialBalance);
+                    it("Buying should refund ether to the payer if paid more than enough", async () => {
+                        const distributorInitialBalance = new BN(await web3.eth.getBalance(distributorID));
 
-                        console.log('adding', web3.utils.toBN(farmerInitialBalance).add(web3.utils.toBN(farmerFinalBalance)).toString());
+                        await supplyChain.buyItem(upc, { from: distributorID, value: web3.utils.toWei("5", "ether") });
 
-                        truffleAssert.eventEmitted(lastTx, 'Sold', { upc: web3.utils.toBN(upc) });
+                        const distributorFinalBalance = new BN(await web3.eth.getBalance(distributorID));
+                        const distributorBalanceChange = distributorInitialBalance.clone().sub(distributorFinalBalance);
+                        const maxTransactionFee = new BN(web3.utils.toWei("0.01", "ether"));
+
+                        expect(distributorBalanceChange).to.gt.BN(productPrice);
+                        expect(distributorBalanceChange).to.lt.BN(productPrice.clone().add(maxTransactionFee));
                     });
 
                     it("Should not allow to buy item when caller not in distributor role", async () => {
