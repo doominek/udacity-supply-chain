@@ -3,10 +3,11 @@ pragma solidity ^0.4.24;
 import "../coffeeaccesscontrol/FarmerRole.sol";
 import "../coffeeaccesscontrol/DistributorRole.sol";
 import "../coffeeaccesscontrol/RetailerRole.sol";
+import "../coffeeaccesscontrol/ConsumerRole.sol";
 
 
 // Define a contract 'Supplychain'
-contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
+contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole {
 
     // Define 'owner'
     address private owner;
@@ -18,11 +19,11 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
     uint private sku;
 
     // Define a public mapping 'items' that maps the UPC to an Item.
-    mapping(uint => Item) public items;
+    mapping(uint => Item) items;
 
     // Define a public mapping 'itemsHistory' that maps the UPC to an array of TxHash,
     // that track its journey through the supply chain -- to be sent from DApp.
-    mapping(uint => string[]) public itemsHistory;
+    mapping(uint => string[]) itemsHistory;
 
     // Define enum 'State' with the following values:
     enum State {
@@ -299,6 +300,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
         // Call modifier to check if upc has passed previous supply chain stage
         received(_upc)
         // Access Control List enforced by calling Smart Contract / DApp
+        onlyConsumer
         paidEnough(_upc)
         checkValue(_upc)
     {
