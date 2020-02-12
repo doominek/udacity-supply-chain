@@ -39,9 +39,14 @@ contract('SupplyChain', function (accounts) {
 
     let supplyChain;
     let lastTx;
+    let run = 0;
 
-    beforeEach(async () => {
+    before(async () => {
         supplyChain = await SupplyChain.deployed();
+        await supplyChain.addFarmer(originFarmerID);
+        await supplyChain.addDistributor(distributorID);
+        await supplyChain.addRetailer(retailerID);
+        await supplyChain.addConsumer(consumerID);
     });
 
     // 1st Test
@@ -72,7 +77,7 @@ contract('SupplyChain', function (accounts) {
         beforeEach(async () => {
             await supplyChain.harvestItem(upc, originFarmerID, originFarmName,
                 originFarmInformation, originFarmLatitude,
-                originFarmLongitude, productNotes);
+                originFarmLongitude, productNotes, { from: originFarmerID });
         });
 
         // 2nd Test
@@ -189,8 +194,6 @@ contract('SupplyChain', function (accounts) {
 
                     // 5th Test
                     it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async () => {
-                        await supplyChain.addDistributor(distributorID, { from: ownerID });
-
                         // Mark an item as Sold by calling function buyItem()
                         lastTx = await supplyChain.buyItem(upc, { from: distributorID, value: productPrice });
 
@@ -250,7 +253,7 @@ contract('SupplyChain', function (accounts) {
 
                     describe("after buying", async () => {
                         beforeEach(async () => {
-                            await supplyChain.buyItem(upc, { value: productPrice });
+                            await supplyChain.buyItem(upc, { value: productPrice, from: distributorID });
                         });
 
 
@@ -293,8 +296,6 @@ contract('SupplyChain', function (accounts) {
 
                             // 7th Test
                             it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
-                                await supplyChain.addRetailer(retailerID);
-
                                 // Mark an item as Received by calling function receiveItem()
                                 lastTx = await supplyChain.receiveItem(upc, { from: retailerID });
 
@@ -330,13 +331,11 @@ contract('SupplyChain', function (accounts) {
 
                             describe("after receiving", async () => {
                                 beforeEach(async () => {
-                                    await supplyChain.receiveItem(upc);
+                                    await supplyChain.receiveItem(upc, { from: retailerID });
                                 });
 
                                 // 8th Test
                                 it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
-                                    await supplyChain.addConsumer(consumerID, { from: ownerID });
-
                                     // Mark an item as Sold by calling function buyItem()
                                     lastTx = await supplyChain.purchaseItem(upc, {
                                         from: consumerID,
@@ -356,11 +355,11 @@ contract('SupplyChain', function (accounts) {
                                 });
 
                                 it("Purchasing should transfer ether to distributor", async () => {
-                                    const distributorInitialBalance = new BN(await web3.eth.getBalance(ownerID));
+                                    const distributorInitialBalance = new BN(await web3.eth.getBalance(distributorID));
 
                                     await supplyChain.purchaseItem(upc, { from: consumerID, value: productPrice });
 
-                                    const distributorFinalBalance = new BN(await web3.eth.getBalance(ownerID));
+                                    const distributorFinalBalance = new BN(await web3.eth.getBalance(distributorID));
 
                                     expect(distributorFinalBalance).to.eq.BN(distributorInitialBalance.add(productPrice));
                                 });
@@ -402,7 +401,7 @@ contract('SupplyChain', function (accounts) {
 
                                 describe("after purchasing", async () => {
                                     beforeEach(async () => {
-                                        await supplyChain.purchaseItem(upc, { value: productPrice });
+                                        await supplyChain.purchaseItem(upc, { value: productPrice, from: consumerID });
                                     });
 
                                     // 9th Test
@@ -412,7 +411,7 @@ contract('SupplyChain', function (accounts) {
 
                                         // Verify the result set
                                         assert.equal(result.itemUPC, upc, 'Error: Invalid item UPC');
-                                        assert.equal(result.ownerID, ownerID, 'Error: Missing or Invalid ownerID');
+                                        assert.equal(result.ownerID, consumerID, 'Error: Missing or Invalid ownerID');
                                         assert.equal(result.originFarmerID, originFarmerID, 'Error: Missing or Invalid originFarmerID');
                                         assert.equal(result.originFarmName, originFarmName, 'Error: Missing or Invalid originFarmName');
                                         assert.equal(result.originFarmInformation, originFarmInformation, 'Error: Missing or Invalid originFarmInformation');
@@ -429,9 +428,9 @@ contract('SupplyChain', function (accounts) {
                                         assert.equal(result.productNotes, productNotes, 'Error: Missing or Invalid productNotes');
                                         assert.equal(result.productPrice.toString(), productPrice.toString(), 'Error: Missing or Invalid productPrice');
                                         assert.equal(result.itemState, ItemStates.PURCHASED.value, 'Error: Missing or Invalid itemState');
-                                        assert.equal(result.distributorID, ownerID, 'Error: Missing or Invalid distributorID');
-                                        assert.equal(result.retailerID, ownerID, 'Error: Missing or Invalid retailerID');
-                                        assert.equal(result.consumerID, ownerID, 'Error: Missing or Invalid consumerID');
+                                        assert.equal(result.distributorID, distributorID, 'Error: Missing or Invalid distributorID');
+                                        assert.equal(result.retailerID, retailerID, 'Error: Missing or Invalid retailerID');
+                                        assert.equal(result.consumerID, consumerID, 'Error: Missing or Invalid consumerID');
                                     });
                                 });
                             });
