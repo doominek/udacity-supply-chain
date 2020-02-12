@@ -9,24 +9,23 @@ import "../coffeeaccesscontrol/RetailerRole.sol";
 contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
 
     // Define 'owner'
-    address owner;
+    address private owner;
 
     // Define a variable called 'upc' for Universal Product Code (UPC)
-    uint  upc;
+    uint private upc;
 
     // Define a variable called 'sku' for Stock Keeping Unit (SKU)
-    uint  sku;
+    uint private sku;
 
     // Define a public mapping 'items' that maps the UPC to an Item.
     mapping(uint => Item) public items;
 
     // Define a public mapping 'itemsHistory' that maps the UPC to an array of TxHash,
     // that track its journey through the supply chain -- to be sent from DApp.
-    mapping(uint => string[]) itemsHistory;
+    mapping(uint => string[]) public itemsHistory;
 
     // Define enum 'State' with the following values:
-    enum State
-    {
+    enum State {
         Harvested, // 0
         Processed, // 1
         Packed, // 2
@@ -37,7 +36,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
         Purchased   // 7
     }
 
-    State constant defaultState = State.Harvested;
+    State private constant DEFAULT_STATE = State.Harvested;
 
     // Define a struct 'Item' with the following fields:
     struct Item {
