@@ -392,7 +392,7 @@ contract('SupplyChain', function (accounts) {
                                     }
                                 });
 
-                                it.skip("Should not allow to buy item when it's not for sale", async () => {
+                                it("Should not allow to buy item when it's not for sale", async () => {
                                     try {
                                         await supplyChain.purchaseItem(upc, { value: productPrice });
                                         await supplyChain.purchaseItem(upc, { value: productPrice });

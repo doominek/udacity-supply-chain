@@ -18,7 +18,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
     uint  sku;
 
     // Define a public mapping 'items' that maps the UPC to an Item.
-    mapping(uint => Item) items;
+    mapping(uint => Item) public items;
 
     // Define a public mapping 'itemsHistory' that maps the UPC to an array of TxHash,
     // that track its journey through the supply chain -- to be sent from DApp.
@@ -132,13 +132,13 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole {
 
     // Define a modifier that checks if an item.state of a upc is Received
     modifier received(uint _upc) {
-
+        require(items[_upc].itemState == State.Received, "Item must be received");
         _;
     }
 
     // Define a modifier that checks if an item.state of a upc is Purchased
     modifier purchased(uint _upc) {
-
+        require(items[_upc].itemState == State.Purchased, "Item must be purchased");
         _;
     }
 
