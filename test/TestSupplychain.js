@@ -18,6 +18,7 @@ const ItemStates = Object.freeze({
     SOLD: { name: "Sold", value: 4 },
     SHIPPED: { name: "Shipped", value: 5 },
     RECEIVED: { name: "Received", value: 6 },
+    PURCHASED: { name: "Purchased", value: 7 }
 });
 
 contract('SupplyChain', function (accounts) {
@@ -71,7 +72,7 @@ contract('SupplyChain', function (accounts) {
 
     describe("after harvesting", async () => {
         beforeEach(async () => {
-            lastTx = await supplyChain.harvestItem(upc, originFarmerID, originFarmName,
+            await supplyChain.harvestItem(upc, originFarmerID, originFarmName,
                 originFarmInformation, originFarmLatitude,
                 originFarmLongitude, productNotes);
         });
@@ -110,7 +111,7 @@ contract('SupplyChain', function (accounts) {
 
         describe("after processing", async () => {
             beforeEach(async () => {
-                lastTx = await supplyChain.processItem(upc);
+                await supplyChain.processItem(upc);
             });
 
             it("Testing smart contract function packItem() that allows a farmer to pack coffee", async () => {
@@ -146,7 +147,7 @@ contract('SupplyChain', function (accounts) {
 
             describe("after packing", async () => {
                 beforeEach(async () => {
-                    lastTx = await supplyChain.packItem(upc);
+                    await supplyChain.packItem(upc);
                 });
 
                 // 4th Test
@@ -185,7 +186,7 @@ contract('SupplyChain', function (accounts) {
 
                 describe("after selling", async () => {
                     beforeEach(async () => {
-                        lastTx = await supplyChain.sellItem(upc, productPrice);
+                        await supplyChain.sellItem(upc, productPrice);
                     });
 
                     // 5th Test
@@ -251,7 +252,7 @@ contract('SupplyChain', function (accounts) {
 
                     describe("after buying", async () => {
                         beforeEach(async () => {
-                            lastTx = await supplyChain.buyItem(upc, { value: productPrice });
+                            await supplyChain.buyItem(upc, { value: productPrice });
                         });
 
 
@@ -289,9 +290,8 @@ contract('SupplyChain', function (accounts) {
 
                         describe("after shipping", async () => {
                             beforeEach(async () => {
-                                lastTx = await supplyChain.shipItem(upc);
+                                await supplyChain.shipItem(upc);
                             });
-
 
                             // 7th Test
                             it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
@@ -330,22 +330,77 @@ contract('SupplyChain', function (accounts) {
                                 }
                             });
 
-                            // 8th Test
-                            it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
-                                // Declare and Initialize a variable for event
+                            describe("after receiving", async () => {
+                                beforeEach(async () => {
+                                    await supplyChain.receiveItem(upc);
+                                });
 
+                                // 8th Test
+                                it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
+                                    // await supplyChain.addDistributor(distributorID, { from: ownerID });
 
-                                // Watch the emitted event Purchased()
+                                    // Mark an item as Sold by calling function buyItem()
+                                    lastTx = await supplyChain.purchaseItem(upc, {
+                                        from: consumerID,
+                                        value: productPrice
+                                    });
 
+                                    // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                                    const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
+                                    const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
 
-                                // Mark an item as Sold by calling function buyItem()
+                                    // Verify the result set
+                                    assert.equal(resultBufferTwo.itemState, ItemStates.PURCHASED.value, 'Item should be in Purchased state');
+                                    assert.equal(resultBufferTwo.consumerID, consumerID, 'Consumer should be set');
+                                    assert.equal(resultBufferOne.ownerID, consumerID, 'Owner should be changed to consumer');
 
+                                    truffleAssert.eventEmitted(lastTx, 'Purchased', { upc: web3.utils.toBN(upc) });
+                                });
 
-                                // Retrieve the just now saved item from blockchain by calling function fetchItem()
+                                it.skip("Purchasing should transfer ether to distributor", async () => {
+                                    const distributorInitialBalance = new BN(await web3.eth.getBalance(distributorID));
 
+                                    await supplyChain.purchaseItem(upc, { from: consumerID, value: productPrice });
 
-                                // Verify the result set
+                                    const distributorFinalBalance = new BN(await web3.eth.getBalance(distributorID));
 
+                                    expect(distributorFinalBalance).to.eq.BN(distributorInitialBalance.add(productPrice));
+                                });
+
+                                it.skip("Purchasing should refund ether to the payer if paid more than enough", async () => {
+                                    const consumerInitialBalance = new BN(await web3.eth.getBalance(consumerID));
+
+                                    await supplyChain.purchaseItem(upc, {
+                                        from: consumerID,
+                                        value: web3.utils.toWei("5", "ether")
+                                    });
+
+                                    const consumerFinalBalance = new BN(await web3.eth.getBalance(consumerID));
+                                    const consumerBalanceChange = consumerInitialBalance.clone().sub(consumerFinalBalance);
+                                    const maxTransactionFee = new BN(web3.utils.toWei("0.01", "ether"));
+
+                                    expect(consumerBalanceChange).to.gt.BN(productPrice);
+                                    expect(consumerBalanceChange).to.lt.BN(productPrice.clone().add(maxTransactionFee));
+                                });
+
+                                it.skip("Should not allow to purchase item when caller not in consumer role", async () => {
+                                    try {
+                                        await supplyChain.purchaseItem(upc, { from: retailerID, value: productPrice });
+                                        assert.fail("should throw error");
+                                    } catch (e) {
+                                        assert.equal(e.reason, "Only Consumer allowed")
+                                    }
+                                });
+
+                                it.skip("Should not allow to buy item when it's not for sale", async () => {
+                                    try {
+                                        await supplyChain.purchaseItem(upc, { value: productPrice });
+                                        await supplyChain.purchaseItem(upc, { value: productPrice });
+                                        assert.fail("should throw error");
+                                    } catch (e) {
+                                        assert.equal(e.reason, "Item must be received")
+                                    }
+                                });
                             });
                         });
                     });
