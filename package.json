@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "lite-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint:contracts": "solhint -- \"contracts/**/*.sol\""
+    "contracts:lint": "solhint -- \"contracts/**/*.sol\"",
+    "contracts:coverage": "truffle run coverage"
   },
   "keywords": [],
   "author": "pk <pkrasam@gmail.com> (https://ipfs.infura.io/ipfs/QmSXiR9Khm3yo1J67nUopvVBxFJ8YGN2fUGZ34Etr3m92x/)",
