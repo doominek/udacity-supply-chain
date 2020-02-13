@@ -1,15 +1,19 @@
 module.exports = {
-  networks: {
-    ganache: {
-      host: "127.0.0.1",
-      port: 7545,
-      network_id: "5777"
+    networks: {
+        ganache: {
+            host: "127.0.0.1",
+            port: 7545,
+            network_id: "5777"
+        },
+        development: {
+            host: "127.0.0.1",
+            port: 8545,
+            network_id: "*" // Match any network id
+        }
     },
-    development: {
-      host: "127.0.0.1",
-      port: 8545,
-      network_id: "*" // Match any network id
-    }
-  },
-  plugins: [ "solidity-coverage" ]
+    mocha: {
+        reporter: 'eth-gas-reporter',
+        reporterOptions: { excludeContracts: [ 'Migrations' ] }
+    },
+    plugins: [ "solidity-coverage" ]
 };
