@@ -17,6 +17,7 @@
     "bn.js": "5.1.1",
     "chai": "4.2.0",
     "eth-gas-reporter": "0.2.15",
+    "ganache-cli": "6.9.0",
     "lite-server": "2.4.0",
     "solhint": "2.3.0",
     "solidity-coverage": "0.7.2",
