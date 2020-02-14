@@ -51,6 +51,7 @@ contract SupplyChain is Ownable, FarmerRole, DistributorRole, RetailerRole, Cons
         string originFarmInformation;  // Farmer Information
         string originFarmLatitude; // Farm Latitude
         string originFarmLongitude;  // Farm Longitude
+        string imageIpfsCid; // CID of items image
         uint productID;  // Product ID potentially a combination of upc + sku
         string productNotes; // Product Notes
         uint productPrice; // Product Price
@@ -156,7 +157,7 @@ contract SupplyChain is Ownable, FarmerRole, DistributorRole, RetailerRole, Cons
     // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
     function harvestItem(uint _upc, address payable _originFarmerID, string memory _originFarmName,
         string memory _originFarmInformation, string memory _originFarmLatitude, string memory _originFarmLongitude,
-        string memory _productNotes) public
+        string memory _productNotes, string memory _imageIpfsCid) public
     {
         // Add the new item as part of Harvest
         Item memory newItem = Item({
@@ -168,6 +169,7 @@ contract SupplyChain is Ownable, FarmerRole, DistributorRole, RetailerRole, Cons
             originFarmInformation : _originFarmInformation,
             originFarmLatitude : _originFarmLatitude,
             originFarmLongitude : _originFarmLongitude,
+            imageIpfsCid : _imageIpfsCid,
             productID : 0,
             productNotes : _productNotes,
             productPrice : 0,
@@ -323,7 +325,8 @@ contract SupplyChain is Ownable, FarmerRole, DistributorRole, RetailerRole, Cons
         string memory originFarmName,
         string memory originFarmInformation,
         string memory originFarmLatitude,
-        string memory originFarmLongitude
+        string memory originFarmLongitude,
+        string memory imageIpfsCid
     )
     {
         // Assign values to the 8 parameters
@@ -336,6 +339,7 @@ contract SupplyChain is Ownable, FarmerRole, DistributorRole, RetailerRole, Cons
         originFarmInformation = item.originFarmInformation;
         originFarmLatitude = item.originFarmLatitude;
         originFarmLongitude = item.originFarmLongitude;
+        imageIpfsCid = item.imageIpfsCid;
 
         return
         (
@@ -346,7 +350,8 @@ contract SupplyChain is Ownable, FarmerRole, DistributorRole, RetailerRole, Cons
         originFarmName,
         originFarmInformation,
         originFarmLatitude,
-        originFarmLongitude
+        originFarmLongitude,
+        imageIpfsCid
         );
     }
 

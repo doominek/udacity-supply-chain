@@ -33,13 +33,13 @@ contract('SupplyChain', function (accounts) {
     const originFarmLongitude = "144.341490";
     const productNotes = "Best beans for Espresso";
     const productPrice = web3.utils.toWei(new BN("1"), "ether");
+    const imageIpfsCid = "ipfsCid";
     const distributorID = accounts[2];
     const retailerID = accounts[3];
     const consumerID = accounts[4];
 
     let supplyChain;
     let lastTx;
-    let run = 0;
 
     before(async () => {
         supplyChain = await SupplyChain.deployed();
@@ -54,7 +54,7 @@ contract('SupplyChain', function (accounts) {
         // Mark an item as Harvested by calling function harvestItem()
         lastTx = await supplyChain.harvestItem(upc, originFarmerID, originFarmName,
             originFarmInformation, originFarmLatitude,
-            originFarmLongitude, productNotes);
+            originFarmLongitude, productNotes, imageIpfsCid);
 
         // Retrieve the just now saved item from blockchain by calling function fetchItem()
         const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
@@ -69,6 +69,7 @@ contract('SupplyChain', function (accounts) {
         assert.equal(resultBufferOne[5], originFarmInformation, 'Error: Missing or Invalid originFarmInformation');
         assert.equal(resultBufferOne[6], originFarmLatitude, 'Error: Missing or Invalid originFarmLatitude');
         assert.equal(resultBufferOne[7], originFarmLongitude, 'Error: Missing or Invalid originFarmLongitude');
+        assert.equal(resultBufferOne[8], imageIpfsCid, 'Error: Missing or Invalid imageIpfsCid');
         assert.equal(resultBufferTwo[5], ItemStates.HARVESTED.value, 'Error: Invalid item State');
         truffleAssert.eventEmitted(lastTx, 'Harvested', { upc: web3.utils.toBN(upc) });
     });
@@ -77,7 +78,7 @@ contract('SupplyChain', function (accounts) {
         beforeEach(async () => {
             await supplyChain.harvestItem(upc, originFarmerID, originFarmName,
                 originFarmInformation, originFarmLatitude,
-                originFarmLongitude, productNotes, { from: originFarmerID });
+                originFarmLongitude, productNotes, imageIpfsCid, { from: originFarmerID });
         });
 
         // 2nd Test
