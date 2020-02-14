@@ -7,6 +7,9 @@
 #### Activity Diagram
 ![Activity Diagram](docs/activity-diagram.svg)
 
+#### Class Diagram
+![Activity Diagram](docs/class-diagram.svg)
+
 
 ## Libraries used
 In the project following libraries were used:
