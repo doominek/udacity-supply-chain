@@ -7,6 +7,9 @@
 #### Activity Diagram
 ![Activity Diagram](docs/activity-diagram.svg)
 
+#### Sequence Diagram
+![Activity Diagram](docs/sequence-diagram.svg)
+
 #### Class Diagram
 ![Activity Diagram](docs/class-diagram.svg)
 
