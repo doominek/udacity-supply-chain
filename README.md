@@ -10,6 +10,9 @@
 #### Sequence Diagram
 ![Activity Diagram](docs/sequence-diagram.svg)
 
+#### Sequence Diagram
+![Activity Diagram](docs/state-diagram.svg)
+
 #### Class Diagram
 ![Activity Diagram](docs/class-diagram.svg)
 
