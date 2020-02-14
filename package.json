@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "lite-server",
+    "contracts:test": "truffle test",
     "contracts:lint": "solhint -- \"contracts/**/*.sol\"",
     "contracts:coverage": "truffle run coverage"
   },
