@@ -1,5 +1,13 @@
 # Supply Chain - DApp
 
+## Project Write-Up
+
+### UML diagrams
+
+#### Activity Diagram
+![Activity Diagram](docs/activity-diagram.svg)
+
+
 ## Libraries used
 In the project following libraries were used:
 * **truffle** _[5.1.12]_ - development environment and testing framework
