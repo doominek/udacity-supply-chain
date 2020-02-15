@@ -109,10 +109,6 @@
         UPC
         <br>
         <input type="number" id="upc" name="upc" value=1><br>
-        Farmer ID
-        <br>
-        <input type="text" id="originFarmerID" name="originFarmerID" value="0x99c289eb2aacec289631a5ddf62cf27a63d4494f"
-               size="50"><br>
         Farm Name
         <br>
         <input type="text" id="originFarmName" name="originFarmName" value="John Doe"><br>
@@ -138,27 +134,19 @@
 
         Product Price
         <br>
-        <input type="number" id="productPrice" name="productPrice" value=1>ETH<br>
+        <input type="number" id="productPrice" name="productPrice" value=1 step="0.1">ETH<br>
 
         <button class="btn-forsale" id="button" type="button" data-id="4">ForSale</button>
     </div>
     <div class=form-break></div>
     <h2>Distributor</h2>
     <div class="form-group">
-        Distributor ID
+        UPC
         <br>
-        <input type="text" id="distributorID" name="distributorID" value="0xf1b1bcd24dad92303dd9fe78be639f7bcf9c238d"
-               size="50">
+        <input type="number" id="distributorUpc" name="distrbutorUpc" value=1><br>
+        Spend amount
         <br>
-        Retailer ID
-        <br>
-        <input type="text" id="retailerID" name="retailerID" value="0x0fb2bfefd526966c87efa19f6693d50971763fc2"
-               size="50"><br>
-        Distributor ID
-        <br>
-        <input type="text" id="consumerID" name="consumerID" value="0x5d777e9127b28fb119e81a6304278a0a21bef1c4"
-               size="50"><br>
-        <br>
+        <input type="number" id="buyPrice" name="buyPrice" value=1 step="0.1">ETH<br>
         <button class="btn-buy" id="button" type="button" data-id="5">Buy</button>
         <button class="btn-ship" id="button" type="button" data-id="6">Ship</button>
     </div>
