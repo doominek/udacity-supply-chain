@@ -1,3 +1,8 @@
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const fs = require('fs');
+
+const { rinkeby } = JSON.parse(fs.readFileSync("./secrets.json").toString());
+
 module.exports = {
     networks: {
         ganache: {
@@ -9,7 +14,11 @@ module.exports = {
             host: "127.0.0.1",
             port: 8545,
             network_id: "*" // Match any network id
-        }
+        },
+        rinkeby: {
+            provider: () => new HDWalletProvider(rinkeby.mnemonic, rinkeby.provider),
+            network_id: 4       // Rinkeby's id
+        },
     },
     mocha: {
         reporter: 'eth-gas-reporter',

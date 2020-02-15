@@ -13,10 +13,12 @@
   "author": "pk <pkrasam@gmail.com> (https://ipfs.infura.io/ipfs/QmSXiR9Khm3yo1J67nUopvVBxFJ8YGN2fUGZ34Etr3m92x/)",
   "license": "MIT",
   "devDependencies": {
+    "@truffle/hdwallet-provider": "^1.0.31",
     "bn-chai": "1.0.1",
     "bn.js": "5.1.1",
     "chai": "4.2.0",
     "eth-gas-reporter": "0.2.15",
+    "fs": "0.0.1-security",
     "ganache-cli": "6.9.0",
     "lite-server": "2.4.0",
     "solhint": "2.3.0",

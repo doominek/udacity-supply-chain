@@ -3,3 +3,4 @@
 /.idea/
 coverage.json
 coverage
+secrets.json
