@@ -294,10 +294,10 @@ App = {
 
     receiveItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const upc = $("#retailerUpc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
-            return instance.receiveItem(App.upc, { from: App.metamaskAccountID });
+            return instance.receiveItem(upc, { from: App.metamaskAccountID });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('receiveItem', result);
@@ -308,11 +308,12 @@ App = {
 
     purchaseItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const amountToSpend = $("#purchasePrice").val();
+        const upc = $("#consumerUpc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
-            const walletValue = web3.toWei(3, "ether");
-            return instance.purchaseItem(App.upc, { from: App.metamaskAccountID, value: walletValue });
+            const walletValue = web3.toWei(amountToSpend, "ether");
+            return instance.purchaseItem(upc, { from: App.metamaskAccountID, value: walletValue });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('purchaseItem', result);
