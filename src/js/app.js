@@ -136,10 +136,7 @@ App = {
             App.contracts.SupplyChain = TruffleContract(SupplyChainArtifact);
             App.contracts.SupplyChain.setProvider(App.web3Provider);
 
-            App.fetchItemBufferOne();
-            App.fetchItemBufferTwo();
             App.fetchEvents();
-
         });
 
         return App.bindEvents();
@@ -180,12 +177,6 @@ App = {
             case 8:
                 return await App.purchaseItem(event);
                 break;
-            case 9:
-                return await App.fetchItemBufferOne(event);
-                break;
-            case 10:
-                return await App.fetchItemBufferTwo(event);
-                break;
             case 11:
                 return await App.fetchItem(event);
         }
@@ -220,10 +211,10 @@ App = {
 
     processItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const upc = $("#upc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
-            return instance.processItem(App.upc, { from: App.metamaskAccountID });
+            return instance.processItem(upc, { from: App.metamaskAccountID });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('processItem', result);
@@ -234,10 +225,10 @@ App = {
 
     packItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const upc = $("#upc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
-            return instance.packItem(App.upc, { from: App.metamaskAccountID });
+            return instance.packItem(upc, { from: App.metamaskAccountID });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('packItem', result);
@@ -248,12 +239,12 @@ App = {
 
     sellItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const upc = $("#upc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
             const productPrice = web3.toWei($("#productPrice").val(), "ether");
             console.log('productPrice', productPrice);
-            return instance.sellItem(App.upc, productPrice, { from: App.metamaskAccountID });
+            return instance.sellItem(upc, productPrice, { from: App.metamaskAccountID });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('sellItem', result);
