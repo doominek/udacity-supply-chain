@@ -187,6 +187,8 @@ App = {
             case 10:
                 return await App.fetchItemBufferTwo(event);
                 break;
+            case 11:
+                return await App.fetchItem(event);
         }
     },
 
@@ -319,6 +321,48 @@ App = {
         });
     },
 
+    fetchItem: async () => {
+        const upcSearch = $('.find-item-input').val();
+
+        const instance = await App.contracts.SupplyChain.deployed();
+        const bufferOneData = await instance.fetchItemBufferOne(upcSearch);
+        const bufferTwoData = await instance.fetchItemBufferTwo(upcSearch);
+
+        console.log(bufferOneData);
+        console.log(bufferTwoData);
+
+        const [ sku, upc, ownerID, originFarmerID, originFarmName, originFarmInformation,
+            originFarmLatitude, originFarmLongitude, imageIpfsCid ] = bufferOneData;
+
+        const [ itemSKU, itemUPC, productID, productNotes, productPrice, itemState,
+            distributorID, retailerID, consumerID] = bufferTwoData;
+
+        $("#item-data-upc").val(upc);
+        $("#item-data-sku").val(sku);
+        $("#item-data-state").val(itemState);
+        $("#item-data-product-price").val(productPrice);
+        $("#item-data-product-notes").val(productNotes);
+
+        $("#item-data-farm-name").val(originFarmName);
+        $("#item-data-farm-information").val(originFarmInformation);
+        $("#item-data-farm-latitude").val(originFarmLatitude);
+        $("#item-data-farm-longitude").val(originFarmLongitude);
+
+        $("#item-data-owner").val(ownerID);
+        $("#item-data-farmer").val(originFarmerID);
+        $("#item-data-distributor").val(distributorID);
+        $("#item-data-retailer").val(retailerID);
+        $("#item-data-consumer").val(consumerID);
+
+        if (imageIpfsCid) {
+            $(".item-image")[0].style.display = "block";
+            $(".item-image").attr("src", `https://ipfs.infura.io/ipfs/${imageIpfsCid}`);
+        } else {
+            $(".item-image")[0].style.display = "none";
+            $(".item-image").attr("src", "");
+        }
+    },
+
     fetchItemBufferOne: function () {
         ///   event.preventDefault();
         ///    var processId = parseInt($(event.target).data('id'));
@@ -329,15 +373,6 @@ App = {
             return instance.fetchItemBufferOne(App.upc);
         }).then(function (result) {
             $("#ftc-item").text(result);
-
-            let imageCid = result[8];
-            if (imageCid) {
-                $(".image-section")[0].style.display = "block";
-                $(".item-image").attr("src", `https://ipfs.infura.io/ipfs/${imageCid}`);
-            } else {
-                $(".image-section")[0].style.display = "none";
-                $(".item-image").attr("src", "");
-            }
 
             console.log('fetchItemBufferOne', result);
         }).catch(function (err) {

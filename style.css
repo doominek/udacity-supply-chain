@@ -49,7 +49,6 @@ button {
 .form-group {
     background-color: #0097A7;
     color: black;
-    width: 50%;
     padding: 30px;
     border-radius: 4px;
     background-color: #f8f8f8;
@@ -69,4 +68,43 @@ button {
 .item-image {
     width: 80%;
     margin: 10px 0px;
+}
+
+.find-item-btn {
+    padding: 14px 32px;
+}
+
+.find-item-input {
+    width: 20%;
+    padding: 12px 20px;
+    font-size: 16px;
+}
+
+.item-details {
+    display: flex;
+}
+
+.item-data {
+    flex: 3;
+    font-size: 14px;
+}
+.item-data-row {
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 1.5em;
+}
+.item-data-row > label {
+    flex: 1;
+    align-self: center;
+}
+.item-data-row > input {
+    flex: 3;
+    margin: 3px 0;
+}
+.item-data-row > input {
+    padding: .5em;
+}
+
+.item-image-section {
+    flex: 2
 }
