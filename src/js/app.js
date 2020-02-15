@@ -340,7 +340,7 @@ App = {
         $("#item-data-upc").val(upc);
         $("#item-data-sku").val(sku);
         $("#item-data-state").val(itemState);
-        $("#item-data-product-price").val(productPrice);
+        $("#item-data-product-price").val(web3.fromWei(productPrice));
         $("#item-data-product-notes").val(productNotes);
 
         $("#item-data-farm-name").val(originFarmName);
