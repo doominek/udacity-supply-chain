@@ -328,6 +328,16 @@ App = {
             return instance.fetchItemBufferOne(App.upc);
         }).then(function (result) {
             $("#ftc-item").text(result);
+
+            let imageCid = result[8];
+            if (imageCid) {
+                $(".image-section")[0].style.display = "block";
+                $(".item-image").attr("src", `https://ipfs.infura.io/ipfs/${imageCid}`);
+            } else {
+                $(".image-section")[0].style.display = "none";
+                $(".item-image").attr("src", "");
+            }
+
             console.log('fetchItemBufferOne', result);
         }).catch(function (err) {
             console.log(err.message);
