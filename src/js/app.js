@@ -1,3 +1,14 @@
+const ItemStates = Object.freeze({
+    HARVESTED: { name: "Harvested", value: 0 },
+    PROCESSED: { name: "Processed", value: 1 },
+    PACKED: { name: "Packed", value: 2 },
+    FOR_SALE: { name: "ForSale", value: 3 },
+    SOLD: { name: "Sold", value: 4 },
+    SHIPPED: { name: "Shipped", value: 5 },
+    RECEIVED: { name: "Received", value: 6 },
+    PURCHASED: { name: "Purchased", value: 7 }
+});
+
 App = {
     web3Provider: null,
     contracts: {},
@@ -335,11 +346,17 @@ App = {
             originFarmLatitude, originFarmLongitude, imageIpfsCid ] = bufferOneData;
 
         const [ itemSKU, itemUPC, productID, productNotes, productPrice, itemState,
-            distributorID, retailerID, consumerID] = bufferTwoData;
+            distributorID, retailerID, consumerID ] = bufferTwoData;
+
+        const itemStateName =
+            Object
+                .entries(ItemStates)
+                .find(([ key, value ]) => value.value === itemState.toNumber())[1].name;
+
 
         $("#item-data-upc").val(upc);
         $("#item-data-sku").val(sku);
-        $("#item-data-state").val(itemState);
+        $("#item-data-state").val(itemStateName);
         $("#item-data-product-price").val(web3.fromWei(productPrice));
         $("#item-data-product-notes").val(productNotes);
 
