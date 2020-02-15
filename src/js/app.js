@@ -192,6 +192,7 @@ App = {
 
     harvestItem: async function (event) {
         event.preventDefault();
+        App.readForm();
 
         try {
             const uploadResult = await App.uploadItemImageToIPFS();
