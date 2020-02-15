@@ -264,11 +264,12 @@ App = {
 
     buyItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const amountToSpend = $("#buyPrice").val();
+        const upc = $("#distributorUpc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
-            const walletValue = web3.toWei(3, "ether");
-            return instance.buyItem(App.upc, { from: App.metamaskAccountID, value: walletValue });
+            const walletValue = web3.toWei(amountToSpend, "ether");
+            return instance.buyItem(upc, { from: App.metamaskAccountID, value: walletValue });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('buyItem', result);
@@ -279,10 +280,10 @@ App = {
 
     shipItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
+        const upc = $("#distributorUpc").val();
 
         App.contracts.SupplyChain.deployed().then(function (instance) {
-            return instance.shipItem(App.upc, { from: App.metamaskAccountID });
+            return instance.shipItem(upc, { from: App.metamaskAccountID });
         }).then(function (result) {
             $("#ftc-item").text(result);
             console.log('shipItem', result);
