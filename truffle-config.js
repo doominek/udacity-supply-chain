@@ -17,7 +17,9 @@ module.exports = {
         },
         rinkeby: {
             provider: () => new HDWalletProvider(rinkeby.mnemonic, rinkeby.provider),
-            network_id: 4       // Rinkeby's id
+            network_id: 4,       // Rinkeby's id
+            networkCheckTimeout: 1000000000,
+            timeoutBlocks: 200
         },
     },
     mocha: {
