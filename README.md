@@ -28,3 +28,7 @@ In the project following libraries were used:
 * **solidity-coverage** - library for calculating test coverage for Solidity contracts
 * **eth-gas-reporter** - library for calculating gas usage in Solidity contracts
 
+## Deployment info
+SupplyChain contract has been deployed to Rinkeby test network. Details of deployment:
+* **transaction:** https://rinkeby.etherscan.io/tx/0xbc03e803b2e6a6990b5caeb47c44b24a15093623a4a9df988e2605479da8bc7a
+* **contract address:** https://rinkeby.etherscan.io/address/0xa60db5e7f72f05b557c4420c0224a1e287d0014d
