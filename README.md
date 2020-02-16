@@ -86,3 +86,9 @@ SupplyChain contract has been deployed to Rinkeby test network. Details of deplo
   
   Each section dedicated to specific role has its own UPC context on which the operation will be invoked and Distributor and Consumer
   have additional input for setting the amount that they want to spent to buy/purchase item.
+
+
+In development the following versions were used:
+* node - 10.18.1
+* npm - 6.13.7
+* truffle - 5.1.12
