@@ -83,5 +83,6 @@ SupplyChain contract has been deployed to Rinkeby test network. Details of deplo
   * _Distributor_ - section dedicated to user in distributor role
   * _Retailer_ - section dedicated to user in retailer role
   * _Consumer_ - section dedicated to user in consumer role
+  
   Each section dedicated to specific role has its own UPC context on which the operation will be invoked and Distributor and Consumer
   have additional input for setting the amount that they want to spent to buy/purchase item.
